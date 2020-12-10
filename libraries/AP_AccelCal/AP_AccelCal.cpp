@@ -34,6 +34,8 @@ AP_AccelCal_Client* AP_AccelCal::_clients[AP_ACCELCAL_MAX_NUM_CLIENTS] {};
 
 void AP_AccelCal::update()
 {
+    //hal.console->printf("hal_running accel update\n");
+
     if (!get_calibrator(0)) {
         // no calibrators
         return;
@@ -54,6 +56,9 @@ void AP_AccelCal::update()
         if(_start_collect_sample) {
             collect_sample();
         }
+
+        notify->set_led_override((float)1);
+
         switch(_status) {
             case ACCEL_CAL_NOT_STARTED:
                 fail();
@@ -81,28 +86,35 @@ void AP_AccelCal::update()
                         const char *msg;
                         switch (step) {
                             case ACCELCAL_VEHICLE_POS_LEVEL:
-                                msg = "level";
-                                break;
+                                { notify->handle_rgb((uint8_t)0, (uint8_t)255,(uint8_t)0);
+                                msg = "level"; 
+                                break; }
                             case ACCELCAL_VEHICLE_POS_LEFT:
+                                { notify->handle_rgb((uint8_t)255, (uint8_t)255,(uint8_t)0);
                                 msg = "on its LEFT side";
-                                break;
+                                break; }
                             case ACCELCAL_VEHICLE_POS_RIGHT:
+                                { notify->handle_rgb((uint8_t)255, (uint8_t)110,(uint8_t)0);
                                 msg = "on its RIGHT side";
-                                break;
+                                break; }
                             case ACCELCAL_VEHICLE_POS_NOSEDOWN:
+                                { notify->handle_rgb((uint8_t)255, (uint8_t)0,(uint8_t)180);
                                 msg = "nose DOWN";
-                                break;
+                                break; }
                             case ACCELCAL_VEHICLE_POS_NOSEUP:
+                                { notify->handle_rgb((uint8_t)190, (uint8_t)0,(uint8_t)255);
                                 msg = "nose UP";
-                                break;
+                                break; }
                             case ACCELCAL_VEHICLE_POS_BACK:
+                                { notify->handle_rgb((uint8_t)0, (uint8_t)0,(uint8_t)255);
                                 msg = "on its BACK";
-                                break;
+                                break; }
                             default:
                                 fail();
                                 return;
                         }
                         _printf("Place vehicle %s and press any key.", msg);
+                        hal.console->printf("hal_Place vehicle %s and press any key.", msg);
                         _waiting_for_mavlink_ack = true;
                     }
                 }
@@ -186,6 +198,7 @@ void AP_AccelCal::start(GCS_MAVLINK *gcs)
     if (gcs == nullptr || _started) {
         return;
     }
+
     _start_collect_sample = false;
     _num_active_calibrators = 0;
 
@@ -208,9 +221,42 @@ void AP_AccelCal::start(GCS_MAVLINK *gcs)
     update_status();
 }
 
+
+void AP_AccelCal::start()
+{
+    if (_started) {
+        return;
+    }
+
+    _start_collect_sample = false;
+    _num_active_calibrators = 0;
+
+    AccelCalibrator *cal;
+    for(uint8_t i=0; (cal = get_calibrator(i)); i++) {
+        cal->clear();
+        cal->start(ACCEL_CAL_AXIS_ALIGNED_ELLIPSOID, 6, 0.5f);
+        _num_active_calibrators++;
+    }
+
+    _started = true;
+    _saving = false;
+    _gcs = nullptr;
+    _use_gcs_snoop = true;
+    _last_position_request_ms = 0;
+    _step = 0;
+
+    _last_result = ACCEL_CAL_NOT_STARTED;
+
+    update_status();
+}
+
+
+
 void AP_AccelCal::success()
 {
     _printf("Calibration successful");
+    hal.console->printf("hal_Calibration successful");
+    notify->set_led_override((float)0);
 
     for(uint8_t i=0 ; i < _num_clients ; i++) {
         _clients[i]->_acal_event_success();
@@ -219,11 +265,16 @@ void AP_AccelCal::success()
     _last_result = ACCEL_CAL_SUCCESS;
 
     clear();
+    
+    //hal.scheduler->delay(1000);
+    //hal.scheduler->reboot(false);
 }
 
 void AP_AccelCal::cancel()
 {
     _printf("Calibration cancelled");
+    hal.console->printf("hal_Calibration cancelled");
+    notify->handle_rgb((uint8_t)255, (uint8_t)255,(uint8_t)0);
 
     for(uint8_t i=0 ; i < _num_clients ; i++) {
         _clients[i]->_acal_event_cancellation();
@@ -237,6 +288,8 @@ void AP_AccelCal::cancel()
 void AP_AccelCal::fail()
 {
     _printf("Calibration FAILED");
+    hal.console->printf("hal_Calibration FAILED");
+    notify->handle_rgb((uint8_t)255, (uint8_t)0,(uint8_t)0);
 
     for(uint8_t i=0 ; i < _num_clients ; i++) {
         _clients[i]->_acal_event_failure();
@@ -370,6 +423,17 @@ void AP_AccelCal::handleMessage(const mavlink_message_t &msg)
         _start_collect_sample = true;
     }
 }
+
+void AP_AccelCal::handleMessage()
+{
+    if (!_waiting_for_mavlink_ack) {
+        return;
+    }
+    _waiting_for_mavlink_ack = false;
+    _start_collect_sample = true;
+    
+}
+
 
 bool AP_AccelCal::gcs_vehicle_position(float position)
 {

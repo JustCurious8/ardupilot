@@ -179,6 +179,7 @@ void Copter::accel_cal_update()
     if (hal.util->get_soft_armed()) {
         return;
     }
+
     ins.acal_update();
     // check if new trim values, and set them
     float trim_roll, trim_pitch;
@@ -188,6 +189,7 @@ void Copter::accel_cal_update()
 
 #ifdef CAL_ALWAYS_REBOOT
     if (ins.accel_cal_requires_reboot()) {
+        gcs().send_text(MAV_SEVERITY_INFO, "Rebooting after accel cal\n");
         hal.scheduler->delay(1000);
         hal.scheduler->reboot(false);
     }

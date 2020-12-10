@@ -102,6 +102,7 @@ void RC_Channel_Copter::init_aux_function(const aux_func_t ch_option, const aux_
     case AUX_FUNC::USER_FUNC1:
     case AUX_FUNC::USER_FUNC2:
     case AUX_FUNC::USER_FUNC3:
+    case AUX_FUNC::COMP_MOT_CAL:
     case AUX_FUNC::ZIGZAG:
     case AUX_FUNC::ZIGZAG_SaveWP:
     case AUX_FUNC::STABILIZE:
@@ -492,6 +493,17 @@ void RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const aux_sw
             copter.userhook_auxSwitch3(ch_flag);
             break;
 #endif
+
+        case AUX_FUNC::COMP_MOT_CAL:
+			if(ch_flag == HIGH)
+            { 
+              if(copter.motors->armed())
+              { gcs().send_text(MAV_SEVERITY_INFO, "compassmot failed, Vehicle is armed\n");
+                return;  }
+            
+              copter.user_compassmot();
+            }
+            break;
 
         case AUX_FUNC::ZIGZAG:
 #if MODE_ZIGZAG_ENABLED == ENABLED

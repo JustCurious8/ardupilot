@@ -282,6 +282,15 @@ public:
     // update accel calibrator
     void acal_update();
 
+    // start accel calibrator
+    void start_accel_cal();
+
+    // switch accel calibrator
+    void switch_accel_cal();
+    
+    // cancel accel calibrator
+    void cancel_accel_cal();
+
     // simple accel calibration
     MAV_RESULT simple_accel_cal();
 

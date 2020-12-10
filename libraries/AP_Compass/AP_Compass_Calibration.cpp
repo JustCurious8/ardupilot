@@ -44,6 +44,7 @@ void Compass::cal_update()
         _cal_has_run = true;
         return;
     } else if (_cal_has_run && _auto_reboot()) {
+        gcs().send_text(MAV_SEVERITY_INFO, "Rebooting after compass cal\n");
         hal.scheduler->delay(1000);
         hal.scheduler->reboot(false);
     }

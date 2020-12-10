@@ -3424,6 +3424,8 @@ MAV_RESULT GCS_MAVLINK::_handle_command_preflight_calibration(const mavlink_comm
         }
         // reset ahrs's trim to suggested values from calibration routine
         AP::ahrs().set_trim(Vector3f(trim_roll, trim_pitch, 0));
+        gcs().send_text(MAV_SEVERITY_INFO, "CUSTOM_LEVEL_CALIBRATION");
+
         return MAV_RESULT_ACCEPTED;
     }
 
