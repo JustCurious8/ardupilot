@@ -201,6 +201,20 @@ void RC_Channels::read_mode_switch()
     c->read_mode_switch();
 }
 
+bool RC_Channels::get_pwm(uint8_t c, uint16_t &pwm) const
+{
+    RC_Channel *chan = rc_channel(c-1);
+    if (chan == nullptr) {
+        return false;
+    }
+    int16_t pwm_signed = chan->get_radio_in();
+    if (pwm_signed < 0) {
+        return false;
+    }
+    pwm = (uint16_t)pwm_signed;
+    return true;
+}
+
 
 // singleton instance
 RC_Channels *RC_Channels::_singleton;
