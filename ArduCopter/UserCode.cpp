@@ -39,7 +39,17 @@ void Copter::userhook_SlowLoop()
 #ifdef USERHOOK_SUPERSLOWLOOP
 void Copter::userhook_SuperSlowLoop()
 {
-    // put your 1Hz code here
+
+  // use EKF to get innovation
+  Vector3f vel_innovation;
+  Vector3f pos_innovation;
+  Vector3f mag_innovation;
+  float tas_innovation;
+  float yaw_innovation;
+  ahrs.get_innovations(vel_innovation, pos_innovation, mag_innovation, tas_innovation, yaw_innovation);
+
+  gcs().send_text(MAV_SEVERITY_INFO, "YAW_INV:%f",degrees(yaw_innovation));
+
 }
 #endif
 
