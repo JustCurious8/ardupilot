@@ -40,6 +40,11 @@ void Copter::userhook_SlowLoop()
 void Copter::userhook_SuperSlowLoop()
 {
     // put your 1Hz code here
+    if(copter.control_mode == Mode::Number::GUIDED)
+      ServoRelayEvents.do_set_relay(0,1);
+    else if(copter.control_mode == Mode::Number::STABILIZE)
+      ServoRelayEvents.do_set_relay(0,0);
+
 }
 #endif
 

@@ -6,6 +6,7 @@
  */
 
 #include <AP_HAL/AP_HAL.h>
+#include <GCS_MAVLink/GCS.h>
 #include "AP_Relay.h"
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -141,6 +142,7 @@ void AP_Relay::toggle(uint8_t instance)
 {
     if (instance < AP_RELAY_NUM_RELAYS && _pin[instance] != -1) {
         bool ison = hal.gpio->read(_pin[instance]);
+        gcs().send_text(MAV_SEVERITY_WARNING, "ison:%d\n",ison);
         set(instance, !ison);
     }
 }

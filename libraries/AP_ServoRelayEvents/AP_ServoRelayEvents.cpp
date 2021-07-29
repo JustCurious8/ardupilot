@@ -59,10 +59,12 @@ bool AP_ServoRelayEvents::do_set_relay(uint8_t relay_num, uint8_t state)
 {
     AP_Relay *relay = AP::relay();
     if (relay == nullptr) {
+        gcs().send_text(MAV_SEVERITY_WARNING, "nullpointer\n");
         return false;
     }
 
     if (!relay->enabled(relay_num)) {
+        gcs().send_text(MAV_SEVERITY_WARNING, "relay not enabled\n");
         return false;
     }
     if (type == EVENT_TYPE_RELAY && 
@@ -72,10 +74,13 @@ bool AP_ServoRelayEvents::do_set_relay(uint8_t relay_num, uint8_t state)
     }
     if (state == 1) {
         relay->on(relay_num);
+        gcs().send_text(MAV_SEVERITY_WARNING, "relay_num:%u,state 1\n",relay_num);
     } else if (state == 0) {
         relay->off(relay_num);
+        gcs().send_text(MAV_SEVERITY_WARNING, "relay_num:%u,state 0\n",relay_num);
     } else {
         relay->toggle(relay_num);
+        gcs().send_text(MAV_SEVERITY_WARNING, "relay_num:%u,state:%u\n",relay_num,state);
     }
     return true;
 }
