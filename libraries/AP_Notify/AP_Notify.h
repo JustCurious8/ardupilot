@@ -137,6 +137,9 @@ public:
     /// update - allow updates of leds that cannot be updated during a timed interrupt
     void update(void);
 
+    // handle RGB custom function
+    static void handle_rgb(uint8_t r, uint8_t g, uint8_t b, uint8_t rate_hz = 0);
+
     // handle a LED_CONTROL message
     static void handle_led_control(const mavlink_message_t &msg);
 
@@ -162,6 +165,7 @@ public:
     uint8_t get_buzz_level() const  { return _buzzer_level; }
     uint8_t get_buzz_volume() const  { return _buzzer_volume; }
     uint8_t get_led_len() const {return _led_len; }
+    void set_led_override(float val) { _rgb_led_override.set(val); }
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     HAL_Semaphore sf_window_mutex;
