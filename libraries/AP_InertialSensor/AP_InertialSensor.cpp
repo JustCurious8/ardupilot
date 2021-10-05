@@ -1727,6 +1727,42 @@ void AP_InertialSensor::acal_update()
     }
 }
 
+
+// update accel calibrator
+void AP_InertialSensor::start_accel_cal()
+{
+    if(_acal == nullptr) {
+    hal.console->printf("_Acal_NULL\n");
+        return;
+    }
+
+    EXPECT_DELAY_MS(20000);
+    _acal->start();
+
+    hal.console->printf("Starting accel cal\n");
+
+    if (hal.util->get_soft_armed() && _acal->get_status() != ACCEL_CAL_NOT_STARTED) {
+        _acal->cancel();
+    }
+
+}
+
+
+// update accel calibrator
+void AP_InertialSensor::switch_accel_cal()
+{
+    if(_acal == nullptr) {
+    hal.console->printf("_Acal_NULL\n");
+        return;
+    }
+
+    _acal->handleMessage();
+
+    hal.console->printf("Switching accel cal\n");
+}
+
+
+
 // Update the harmonic notch frequency
 void AP_InertialSensor::update_harmonic_notch_freq_hz(float scaled_freq) {
     // protect against zero as the scaled frequency

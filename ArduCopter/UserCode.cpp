@@ -22,10 +22,48 @@ void Copter::userhook_50Hz()
 }
 #endif
 
+
+uint8_t check_rc=0;
+uint8_t check_rc2=0;
+uint16_t usr_rc7={};
+uint16_t usr_rc8={};
+
 #ifdef USERHOOK_MEDIUMLOOP
 void Copter::userhook_MediumLoop()
 {
-    // put your 10Hz code here
+			rc().get_pwm((uint8_t)7,usr_rc7);
+			rc().get_pwm((uint8_t)8,usr_rc8);
+
+   if(usr_rc7 < 1500)
+      check_rc=0;
+
+    // put your 1Hz code here
+   if(usr_rc7 > 1500 and check_rc==0)
+   {  
+				  gcs().send_text(MAV_SEVERITY_INFO, "Initiated GYRO CAL\n");
+				  ins.init_gyro();
+				  if (!ins.gyro_calibrated_ok_all()) {
+				      gcs().send_text(MAV_SEVERITY_INFO, "FALSE\n");
+				  }
+				  ahrs.reset_gyro_drift();
+				  gcs().send_text(MAV_SEVERITY_INFO, "TRUE\n");
+
+      ins.acal_init();
+      ins.start_accel_cal();
+      gcs().send_text(MAV_SEVERITY_INFO,"start_accel_Cal\n");
+      check_rc=1;  
+   }
+
+   if(usr_rc8 < 1500)
+      check_rc2=0;
+
+    // put your 1Hz code here
+   if(usr_rc8 > 1500 and check_rc2==0)
+   {  
+      ins.switch_accel_cal();
+      //gcs().send_text(MAV_SEVERITY_INFO,"start_accel_Cal\n");
+      check_rc2=1; }
+
 }
 #endif
 
@@ -39,7 +77,7 @@ void Copter::userhook_SlowLoop()
 #ifdef USERHOOK_SUPERSLOWLOOP
 void Copter::userhook_SuperSlowLoop()
 {
-    // put your 1Hz code here
+
 }
 #endif
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GCS_MAVLink/GCS_MAVLink.h>
+#include <AP_Notify/AP_Notify.h>
 #include "AccelCalibrator.h"
 #include "AP_Vehicle/AP_Vehicle_Type.h"
 
@@ -19,6 +20,9 @@ public:
     // start all the registered calibrations
     void start(GCS_MAVLINK *gcs);
 
+    // start all the registered calibrations
+    void start();
+
     // called on calibration cancellation
     void cancel();
 
@@ -35,6 +39,7 @@ public:
     static void register_client(AP_AccelCal_Client* client);
 
     void handleMessage(const mavlink_message_t &msg);
+    void handleMessage();
 
 private:
     GCS_MAVLINK *_gcs;
@@ -75,6 +80,9 @@ private:
     uint8_t _num_active_calibrators;
 
     AccelCalibrator* get_calibrator(uint8_t i);
+
+    AP_Notify * notify = AP_Notify::get_singleton();
+
 };
 
 class AP_AccelCal_Client {
