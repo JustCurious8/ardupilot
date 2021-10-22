@@ -87,27 +87,27 @@ void AP_AccelCal::update()
                         const char *msg;
                         switch (step) {
                             case ACCELCAL_VEHICLE_POS_LEVEL:
-                                { notify->handle_rgb((uint8_t)0, (uint8_t)140,(uint8_t)0);
+                                { notify->handle_rgb((uint8_t)0, (uint8_t)255,(uint8_t)0);
                                 msg = "level"; 
                                 break; }
                             case ACCELCAL_VEHICLE_POS_LEFT:
-                                { notify->handle_rgb((uint8_t)0, (uint8_t)255,(uint8_t)0);
+                                { notify->handle_rgb((uint8_t)255, (uint8_t)255,(uint8_t)0);
                                 msg = "on its LEFT side";
                                 break; }
                             case ACCELCAL_VEHICLE_POS_RIGHT:
-                                { notify->handle_rgb((uint8_t)0, (uint8_t)0,(uint8_t)140);
+                                { notify->handle_rgb((uint8_t)255, (uint8_t)110,(uint8_t)0);
                                 msg = "on its RIGHT side";
                                 break; }
                             case ACCELCAL_VEHICLE_POS_NOSEDOWN:
-                                { notify->handle_rgb((uint8_t)0, (uint8_t)0,(uint8_t)255);
+                                { notify->handle_rgb((uint8_t)255, (uint8_t)0,(uint8_t)180);
                                 msg = "nose DOWN";
                                 break; }
                             case ACCELCAL_VEHICLE_POS_NOSEUP:
-                                { notify->handle_rgb((uint8_t)220, (uint8_t)220,(uint8_t)0);
+                                { notify->handle_rgb((uint8_t)190, (uint8_t)0,(uint8_t)255);
                                 msg = "nose UP";
                                 break; }
                             case ACCELCAL_VEHICLE_POS_BACK:
-                                { notify->handle_rgb((uint8_t)255, (uint8_t)150,(uint8_t)0);
+                                { notify->handle_rgb((uint8_t)0, (uint8_t)0,(uint8_t)255);
                                 msg = "on its BACK";
                                 break; }
                             default:
@@ -266,6 +266,7 @@ void AP_AccelCal::success()
     _last_result = ACCEL_CAL_SUCCESS;
 
     clear();
+    hal.scheduler->reboot(false);
 }
 
 void AP_AccelCal::cancel()

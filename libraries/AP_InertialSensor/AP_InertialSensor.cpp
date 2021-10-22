@@ -1736,14 +1736,16 @@ void AP_InertialSensor::start_accel_cal()
         return;
     }
 
-    EXPECT_DELAY_MS(20000);
-    _acal->start();
+    if(hal.util->get_soft_armed())
+    {   hal.console->printf("ARM TRUE\n");
+        _acal->cancel(); 
+        return;  }
+    else
+        hal.console->printf("ARM FALSE\n");    
 
     hal.console->printf("Starting accel cal\n");
 
-    if (hal.util->get_soft_armed() && _acal->get_status() != ACCEL_CAL_NOT_STARTED) {
-        _acal->cancel();
-    }
+    _acal->start();
 
 }
 
@@ -1752,13 +1754,14 @@ void AP_InertialSensor::start_accel_cal()
 void AP_InertialSensor::switch_accel_cal()
 {
     if(_acal == nullptr) {
-    hal.console->printf("_Acal_NULL\n");
+        hal.console->printf("_Acal_NULL\n");
         return;
     }
 
+    hal.console->printf("Switching accel cal\n");
+
     _acal->handleMessage();
 
-    hal.console->printf("Switching accel cal\n");
 }
 
 

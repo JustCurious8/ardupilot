@@ -25,6 +25,8 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
     bool     updated = false;           // have we updated the compensation vector at least once
     uint8_t  command_ack_start = command_ack_counter;
 
+    gcs_chan.send_text(MAV_SEVERITY_CRITICAL, "COMPASS/MOT CAL initiated\n");
+
     // exit immediately if we are already in compassmot
     if (ap.compass_mot) {
         // ignore restart messages
@@ -88,7 +90,8 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
     mavlink_msg_command_ack_send(gcs_chan.get_chan(), MAV_CMD_PREFLIGHT_CALIBRATION,0);
 
     // flash leds
-    AP_Notify::flags.esc_calibration = true;
+    //AP_Notify::flags.esc_calibration = true;
+    notify.set_led_override((float)1);
 
     // warn user we are starting calibration
     gcs_chan.send_text(MAV_SEVERITY_INFO, "Starting calibration");
@@ -216,8 +219,21 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
             throttle_pct_max = MAX(throttle_pct_max, throttle_pct);
         }
 
-        if (AP_HAL::millis() - last_send_time > 500) {
+        if(interference_pct[0]<30)
+           AP_Notify::handle_rgb((uint8_t)0, (uint8_t)255, (uint8_t)0);
+
+        else if(interference_pct[0]>=30 and interference_pct[0]<75)
+           AP_Notify::handle_rgb((uint8_t)0, (uint8_t)0, (uint8_t)255);
+
+        else if(interference_pct[0]>=75 and interference_pct[0]<200)
+           AP_Notify::handle_rgb((uint8_t)255, (uint8_t)255, (uint8_t)0);
+
+        else if(interference_pct[0]>=200 and interference_pct[0]<500)
+           AP_Notify::handle_rgb((uint8_t)255, (uint8_t)0, (uint8_t)0);
+
+        if (AP_HAL::millis() - last_send_time > 2000) {
             last_send_time = AP_HAL::millis();
+            
             mavlink_msg_compassmot_status_send(gcs_chan.get_chan(),
                                                channel_throttle->get_control_in(),
                                                current,
@@ -252,7 +268,8 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
     report_compass();
 
     // turn off notify leds
-    AP_Notify::flags.esc_calibration = false;
+    //AP_Notify::flags.esc_calibration = false;
+    notify.set_led_override((float)0);
 
     // re-enable cpu failsafe
     failsafe_enable();

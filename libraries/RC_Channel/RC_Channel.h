@@ -175,6 +175,10 @@ public:
         SURFACE_TRACKING =    75, // Surface tracking upwards or downwards
         STANDBY  =            76, // Standby mode
         TAKEOFF   =           77, // takeoff
+        ACCELCAL  =           78, // accel cal using RC
+        ACCEL_SWITCH =        79, // switching to 6 point accel calibration orientations
+        ESC_CAL   =           80, // ESC calibration
+        ACCEL_LEVEL  =        81, // level calibration 
         KILL_IMU1 =          100, // disable first IMU (for IMU failure testing)
         KILL_IMU2 =          101, // disable second IMU (for IMU failure testing)
         CAM_MODE_TOGGLE =    102, // Momentary switch to cycle camera modes

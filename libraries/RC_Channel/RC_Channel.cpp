@@ -463,6 +463,10 @@ void RC_Channel::init_aux_function(const aux_func_t ch_option, const aux_switch_
     case AUX_FUNC::DO_NOTHING:
     case AUX_FUNC::CLEAR_WP:
     case AUX_FUNC::COMPASS_LEARN:
+    case AUX_FUNC::ACCELCAL:
+    case AUX_FUNC::ACCEL_SWITCH:
+    case AUX_FUNC::ESC_CAL:
+    case AUX_FUNC::ACCEL_LEVEL:
     case AUX_FUNC::LANDING_GEAR:
         break;
     case AUX_FUNC::MOTOR_ESTOP:
@@ -737,6 +741,78 @@ void RC_Channel::do_aux_function(const aux_func_t ch_option, const aux_switch_po
             compass.set_learn_type(Compass::LEARN_INFLIGHT, false);
         }
         break;
+
+    case AUX_FUNC::ACCELCAL:
+        if (ch_flag == HIGH) {
+            
+            if(hal.util->get_soft_armed())
+            {  gcs().send_text(MAV_SEVERITY_INFO, "ACCEL CAL FAILED, Vehicle is armed\n");
+               return; }
+
+												gcs().send_text(MAV_SEVERITY_INFO, "Initiated GYRO CAL\n");
+												AP::ins().init_gyro();
+												if (!AP::ins().gyro_calibrated_ok_all()) {
+																gcs().send_text(MAV_SEVERITY_INFO, "FALSE\n");
+												}
+												AP::ahrs().reset_gyro_drift();
+												gcs().send_text(MAV_SEVERITY_INFO, "TRUE\n");
+
+												AP::ins().acal_init();
+												AP::ins().start_accel_cal();
+        }
+        break;
+
+    case AUX_FUNC::ACCEL_SWITCH:
+        if (ch_flag == HIGH) {
+
+            if(hal.util->get_soft_armed())
+            {  gcs().send_text(MAV_SEVERITY_INFO, "ACCEL Command failed, Vehicle is armed\n");
+               return; }
+
+												AP::ins().switch_accel_cal();
+        }
+        break;
+
+
+    case AUX_FUNC::ACCEL_LEVEL:
+        if (ch_flag == HIGH) {
+
+            if(hal.util->get_soft_armed())
+            {  gcs().send_text(MAV_SEVERITY_INFO, "LEVEL CAL FAILED, Vehicle is armed\n");
+               return; }
+
+												gcs().send_text(MAV_SEVERITY_INFO, "Initiated GYRO CAL\n");
+												AP::ins().init_gyro();
+												if (!AP::ins().gyro_calibrated_ok_all()) {
+																gcs().send_text(MAV_SEVERITY_INFO, "GYRO CAL FAILED\n");
+												}
+												AP::ahrs().reset_gyro_drift();
+												gcs().send_text(MAV_SEVERITY_INFO, "GYRO CAL PASSED\n");
+
+
+								    float trim_roll, trim_pitch;
+								    if (!AP::ins().calibrate_trim(trim_roll, trim_pitch)) {
+												    gcs().send_text(MAV_SEVERITY_INFO, "ACCEL_LEVEL CAL FAILED\n");
+								    }
+								    // reset ahrs's trim to suggested values from calibration routine
+								    AP::ahrs().set_trim(Vector3f(trim_roll, trim_pitch, 0));
+								    gcs().send_text(MAV_SEVERITY_INFO, "ACCEL_LEVEL CAL PASSED\n");
+				    
+        }
+        break;
+
+
+    case AUX_FUNC::ESC_CAL:
+        if (ch_flag == HIGH) {
+
+            if(hal.util->get_soft_armed())
+            {  gcs().send_text(MAV_SEVERITY_INFO, "ESC CAL not set, Vehicle is armed\n");
+               return; }
+
+            AP_Param::set_and_save_by_name("ESC_CALIBRATION", 3);
+        }
+        break;
+
 
     case AUX_FUNC::LANDING_GEAR: {
         AP_LandingGear *lg = AP_LandingGear::get_singleton();
