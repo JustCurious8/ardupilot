@@ -85,6 +85,8 @@ void Copter::userhook_SuperSlowLoop()
 void Copter::userhook_auxSwitch1(uint8_t ch_flag)
 {
     // put your aux switch #1 handler here (CHx_OPT = 47)
+										  if (ch_flag == 2)
+										  copter.user_compassmot(); 
 }
 
 void Copter::userhook_auxSwitch2(uint8_t ch_flag)
