@@ -495,8 +495,12 @@ void RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const aux_sw
 #endif
 
         case AUX_FUNC::COMP_MOT_CAL:
-										  if(ch_flag == HIGH)
+			if(ch_flag == HIGH)
             { 
+              if(copter.motors->armed())
+              { gcs().send_text(MAV_SEVERITY_INFO, "compassmot failed, Vehicle is armed\n");
+                return;  }
+            
               copter.user_compassmot();
             }
             break;

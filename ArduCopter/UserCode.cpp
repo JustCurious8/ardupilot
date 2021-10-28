@@ -1,5 +1,11 @@
 #include "Copter.h"
 
+uint8_t check_rc=0;
+uint8_t check_rc2=0;
+uint16_t usr_roll={};
+uint16_t usr_pitch={};
+
+
 #ifdef USERHOOK_INIT
 void Copter::userhook_init()
 {
@@ -19,50 +25,67 @@ void Copter::userhook_FastLoop()
 void Copter::userhook_50Hz()
 {
     // put your 50Hz code here
+    if (hal.util->get_soft_armed()) {
+        return;
+    }
+    
+    static uint32_t accel_switch_gesture_begin = 0;
+    static bool accel_switch_check = false;
+    uint32_t tnow = millis();
+    
+    if(usr_roll > 1850 and usr_pitch > 1850 and !motors->armed())
+    {
+        if (tnow-accel_switch_gesture_begin > 1000*2 and !accel_switch_check)
+        {   
+            AP::ins().switch_accel_cal();
+            accel_switch_check = true;                                                        
+        }
+    }
+    
+    else 
+    {  accel_switch_gesture_begin = tnow;
+       accel_switch_check = false;
+    }
+    
 }
 #endif
-
-
-uint8_t check_rc=0;
-uint8_t check_rc2=0;
-uint16_t usr_rc7={};
-uint16_t usr_rc8={};
 
 #ifdef USERHOOK_MEDIUMLOOP
 void Copter::userhook_MediumLoop()
 {
-			rc().get_pwm((uint8_t)7,usr_rc7);
-			rc().get_pwm((uint8_t)8,usr_rc8);
+    rc().get_pwm((uint8_t)1,usr_roll);
+    rc().get_pwm((uint8_t)2,usr_pitch);
 
-   if(usr_rc7 < 1500)
-      check_rc=0;
+    //gcs().send_text(MAV_SEVERITY_INFO, "Roll:%u,Pitch:%u\n",usr_roll,usr_pitch);
 
-    // put your 1Hz code here
-   if(usr_rc7 > 1500 and check_rc==0)
-   {  
-				  gcs().send_text(MAV_SEVERITY_INFO, "Initiated GYRO CAL\n");
-				  ins.init_gyro();
-				  if (!ins.gyro_calibrated_ok_all()) {
-				      gcs().send_text(MAV_SEVERITY_INFO, "FALSE\n");
-				  }
-				  ahrs.reset_gyro_drift();
-				  gcs().send_text(MAV_SEVERITY_INFO, "TRUE\n");
+    if (hal.util->get_soft_armed()) {
+        return;
+    }
+    
+    static uint32_t inflight_compass_cal_begin = 0;
+    static bool inflight_compass_cal_check = false;
 
-      ins.acal_init();
-      ins.start_accel_cal();
-      gcs().send_text(MAV_SEVERITY_INFO,"start_accel_Cal\n");
-      check_rc=1;  
-   }
+    bool compass_gesture_detected = inflight_compass_cal_begin != 0 && !motors->armed() && usr_roll > 1850 && usr_pitch < 1150;
+    uint32_t tnow = millis();
 
-   if(usr_rc8 < 1500)
-      check_rc2=0;
-
-    // put your 1Hz code here
-   if(usr_rc8 > 1500 and check_rc2==0)
-   {  
-      ins.switch_accel_cal();
-      //gcs().send_text(MAV_SEVERITY_INFO,"start_accel_Cal\n");
-      check_rc2=1; }
+    if (!compass_gesture_detected)
+    {   inflight_compass_cal_begin = tnow;
+        //inflight_compass_cal_check = false;        
+                                                   }
+    else if (tnow-inflight_compass_cal_begin > 1000*4 and !inflight_compass_cal_check)
+    {   gcs().send_text(MAV_SEVERITY_INFO, "Initiated inflight cal\n");
+        compass.set_learn_type(Compass::LEARN_INFLIGHT, false);   
+        inflight_compass_cal_check = true; 
+        notify.set_led_override((float)1);
+        AP_Notify::handle_rgb((uint8_t)0, (uint8_t)0, (uint8_t)255);
+                                                   }
+   
+    if(inflight_compass_cal_check and !compass_gesture_detected)
+    {   if(notify.get_led_override())
+           notify.set_led_override((float)0);
+           
+        inflight_compass_cal_check = false;
+    }
 
 }
 #endif
@@ -71,6 +94,7 @@ void Copter::userhook_MediumLoop()
 void Copter::userhook_SlowLoop()
 {
     // put your 3.3Hz code here
+    
 }
 #endif
 

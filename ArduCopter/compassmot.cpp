@@ -90,8 +90,7 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
     mavlink_msg_command_ack_send(gcs_chan.get_chan(), MAV_CMD_PREFLIGHT_CALIBRATION,0);
 
     // flash leds
-    //AP_Notify::flags.esc_calibration = true;
-    notify.set_led_override((float)1);
+    AP_Notify::flags.esc_calibration = true;
 
     // warn user we are starting calibration
     gcs_chan.send_text(MAV_SEVERITY_INFO, "Starting calibration");
@@ -219,18 +218,6 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
             throttle_pct_max = MAX(throttle_pct_max, throttle_pct);
         }
 
-        if(interference_pct[0]<30)
-           AP_Notify::handle_rgb((uint8_t)0, (uint8_t)255, (uint8_t)0);
-
-        else if(interference_pct[0]>=30 and interference_pct[0]<75)
-           AP_Notify::handle_rgb((uint8_t)0, (uint8_t)0, (uint8_t)255);
-
-        else if(interference_pct[0]>=75 and interference_pct[0]<200)
-           AP_Notify::handle_rgb((uint8_t)255, (uint8_t)255, (uint8_t)0);
-
-        else if(interference_pct[0]>=200 and interference_pct[0]<500)
-           AP_Notify::handle_rgb((uint8_t)255, (uint8_t)0, (uint8_t)0);
-
         if (AP_HAL::millis() - last_send_time > 2000) {
             last_send_time = AP_HAL::millis();
             
@@ -268,8 +255,7 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
     report_compass();
 
     // turn off notify leds
-    //AP_Notify::flags.esc_calibration = false;
-    notify.set_led_override((float)0);
+    AP_Notify::flags.esc_calibration = false;
 
     // re-enable cpu failsafe
     failsafe_enable();
@@ -347,14 +333,14 @@ void Copter::user_compassmot()
     // check throttle is at zero
     read_radio();
     if (channel_throttle->get_control_in() != 0) {
-								hal.console->printf("Throttle not zero\n");
+		hal.console->printf("Throttle not zero\n");
         ap.compass_mot = false;
         return;
     }
 
     // check we are landed
     if (!ap.land_complete) {
-								hal.console->printf("Not landed\n");
+		hal.console->printf("Not landed\n");
         ap.compass_mot = false;
         return;
     }
@@ -379,7 +365,7 @@ void Copter::user_compassmot()
     notify.set_led_override((float)1);
 
     // warn user we are starting calibration
-				hal.console->printf("Starting calibration\n");
+	hal.console->printf("Starting calibration\n");
 
     // inform what type of compensation we are attempting
     if (comp_type == AP_COMPASS_MOT_COMP_CURRENT) {

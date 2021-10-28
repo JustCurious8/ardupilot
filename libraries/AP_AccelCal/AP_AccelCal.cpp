@@ -34,7 +34,6 @@ AP_AccelCal_Client* AP_AccelCal::_clients[AP_ACCELCAL_MAX_NUM_CLIENTS] {};
 
 void AP_AccelCal::update()
 {
-    _printf("running accel update\n");
     //hal.console->printf("hal_running accel update\n");
 
     if (!get_calibrator(0)) {
@@ -266,14 +265,16 @@ void AP_AccelCal::success()
     _last_result = ACCEL_CAL_SUCCESS;
 
     clear();
-    hal.scheduler->reboot(false);
+    
+    //hal.scheduler->delay(1000);
+    //hal.scheduler->reboot(false);
 }
 
 void AP_AccelCal::cancel()
 {
     _printf("Calibration cancelled");
     hal.console->printf("hal_Calibration cancelled");
-    notify->handle_rgb((uint8_t)255, (uint8_t)0,(uint8_t)0);
+    notify->handle_rgb((uint8_t)255, (uint8_t)255,(uint8_t)0);
 
     for(uint8_t i=0 ; i < _num_clients ; i++) {
         _clients[i]->_acal_event_cancellation();

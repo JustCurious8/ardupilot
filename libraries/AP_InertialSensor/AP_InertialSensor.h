@@ -287,6 +287,9 @@ public:
 
     // switch accel calibrator
     void switch_accel_cal();
+    
+    // cancel accel calibrator
+    void cancel_accel_cal();
 
     // simple accel calibration
     MAV_RESULT simple_accel_cal();

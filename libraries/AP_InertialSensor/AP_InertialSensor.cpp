@@ -1732,16 +1732,20 @@ void AP_InertialSensor::acal_update()
 void AP_InertialSensor::start_accel_cal()
 {
     if(_acal == nullptr) {
-    hal.console->printf("_Acal_NULL\n");
         return;
     }
 
     if(hal.util->get_soft_armed())
-    {   hal.console->printf("ARM TRUE\n");
+    {   hal.console->printf("Vehicle Armed, stopped accel cal\n");
         _acal->cancel(); 
-        return;  }
-    else
-        hal.console->printf("ARM FALSE\n");    
+        return;  }  
+        
+     
+    hal.console->printf("ACCEL_CAL_NOT_STARTED, status: %u\n",(uint8_t)_acal->get_status());    
+    if(_acal->get_status() != ACCEL_CAL_NOT_STARTED)
+    {  
+        _acal->cancel(); 
+        return;  }    
 
     hal.console->printf("Starting accel cal\n");
 
@@ -1754,7 +1758,7 @@ void AP_InertialSensor::start_accel_cal()
 void AP_InertialSensor::switch_accel_cal()
 {
     if(_acal == nullptr) {
-        hal.console->printf("_Acal_NULL\n");
+
         return;
     }
 
@@ -1763,6 +1767,22 @@ void AP_InertialSensor::switch_accel_cal()
     _acal->handleMessage();
 
 }
+
+
+// update accel calibrator
+void AP_InertialSensor::cancel_accel_cal()
+{
+    if(_acal == nullptr) {
+        return;
+    }
+
+    hal.console->printf("Cancelling accel cal\n");
+
+    _acal->cancel();
+
+}
+
+
 
 
 

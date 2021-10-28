@@ -166,6 +166,7 @@ public:
     uint8_t get_buzz_volume() const  { return _buzzer_volume; }
     uint8_t get_led_len() const {return _led_len; }
     void set_led_override(float val) { _rgb_led_override.set(val); }
+    uint8_t get_led_override() const { return _rgb_led_override; }
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     HAL_Semaphore sf_window_mutex;

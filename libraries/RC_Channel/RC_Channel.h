@@ -3,6 +3,7 @@
 #pragma once
 
 #include <AP_Common/AP_Common.h>
+#include <AP_Notify/AP_Notify.h>
 #include <AP_Param/AP_Param.h>
 
 #define NUM_RC_CHANNELS 16
@@ -264,6 +265,11 @@ private:
     void reset_mode_switch();
     void read_mode_switch();
     bool debounce_completed(int8_t position);
+    
+    bool check_accel_cal=false;
+    bool check_compassmot_cal=false;
+    
+    AP_Notify * notify = AP_Notify::get_singleton();
 };
 
 

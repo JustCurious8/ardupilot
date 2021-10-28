@@ -51,7 +51,7 @@
 
 
 // features below are disabled by default on all boards
-//#define CAL_ALWAYS_REBOOT                         // flight controller will reboot after compass or accelerometer calibration completes
+#define CAL_ALWAYS_REBOOT                         // flight controller will reboot after compass or accelerometer calibration completes
 //#define DISALLOW_GCS_MODE_CHANGE_DURING_RC_FAILSAFE   // disable mode changes from GCS during Radio failsafes.  Avoids a race condition for vehicle like Solo in which the RC and telemetry travel along the same link
 //#define ADVANCED_FAILSAFE     ENABLED             // enabled advanced failsafe which allows running a portion of the mission in failsafe events
 
@@ -66,8 +66,8 @@
 // Put your custom code into the UserCode.cpp with function names matching those listed below and ensure the appropriate #define below is uncommented below
 //#define USERHOOK_INIT userhook_init();                      // for code to be run once at startup
 //#define USERHOOK_FASTLOOP userhook_FastLoop();            // for code to be run at 100hz
-//#define USERHOOK_50HZLOOP userhook_50Hz();                  // for code to be run at 50hz
-//#define USERHOOK_MEDIUMLOOP userhook_MediumLoop();        // for code to be run at 10hz
+#define USERHOOK_50HZLOOP userhook_50Hz();                  // for code to be run at 50hz
+#define USERHOOK_MEDIUMLOOP userhook_MediumLoop();        // for code to be run at 10hz
 //#define USERHOOK_SLOWLOOP userhook_SlowLoop();            // for code to be run at 3.3hz
 //#define USERHOOK_SUPERSLOWLOOP userhook_SuperSlowLoop();  // for code to be run at 1hz
 //#define USERHOOK_AUXSWITCH ENABLED                        // for code to handle user aux switches
