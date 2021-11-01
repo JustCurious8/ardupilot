@@ -1739,9 +1739,8 @@ void AP_InertialSensor::start_accel_cal()
     {   hal.console->printf("Vehicle Armed, stopped accel cal\n");
         _acal->cancel(); 
         return;  }  
-        
-     
-    hal.console->printf("ACCEL_CAL_NOT_STARTED, status: %u\n",(uint8_t)_acal->get_status());    
+
+           
     if(_acal->get_status() != ACCEL_CAL_NOT_STARTED)
     {  
         _acal->cancel(); 
@@ -1758,9 +1757,11 @@ void AP_InertialSensor::start_accel_cal()
 void AP_InertialSensor::switch_accel_cal()
 {
     if(_acal == nullptr) {
-
         return;
     }
+    
+    if(_acal->get_status() == ACCEL_CAL_NOT_STARTED)  
+        return;
 
     hal.console->printf("Switching accel cal\n");
 
