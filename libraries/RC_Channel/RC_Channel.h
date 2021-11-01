@@ -177,7 +177,7 @@ public:
         STANDBY  =            76, // Standby mode
         TAKEOFF   =           77, // takeoff
         ACCELCAL  =           78, // accel cal using RC
-        ACCEL_SWITCH =        79, // switching to 6 point accel calibration orientations
+        //ACCEL_SWITCH =        79, // switching to 6 point accel calibration orientations
         ESC_CAL   =           80, // ESC calibration
         ACCEL_LEVEL  =        81, // level calibration 
         COMP_MOT_CAL  =       82, // COMPASS/MOT calibration 

@@ -464,7 +464,7 @@ void RC_Channel::init_aux_function(const aux_func_t ch_option, const aux_switch_
     case AUX_FUNC::CLEAR_WP:
     case AUX_FUNC::COMPASS_LEARN:
     case AUX_FUNC::ACCELCAL:
-    case AUX_FUNC::ACCEL_SWITCH:
+    //case AUX_FUNC::ACCEL_SWITCH:
     case AUX_FUNC::ESC_CAL:
     case AUX_FUNC::ACCEL_LEVEL:
     case AUX_FUNC::LANDING_GEAR:
@@ -779,7 +779,7 @@ void RC_Channel::do_aux_function(const aux_func_t ch_option, const aux_switch_po
         }
         break;
         
-
+    /*
     case AUX_FUNC::ACCEL_SWITCH:
         if (ch_flag == HIGH) {
 
@@ -790,8 +790,8 @@ void RC_Channel::do_aux_function(const aux_func_t ch_option, const aux_switch_po
             AP::ins().switch_accel_cal();
         }
         break;
-
-
+    */
+ 
     case AUX_FUNC::ACCEL_LEVEL:
         switch (ch_flag) {
         case HIGH:

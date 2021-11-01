@@ -24,6 +24,10 @@ void Copter::userhook_FastLoop()
 #ifdef USERHOOK_50HZLOOP
 void Copter::userhook_50Hz()
 {
+
+    rc().get_pwm((uint8_t)1,usr_roll);
+    rc().get_pwm((uint8_t)2,usr_pitch);
+
     // put your 50Hz code here
     if (hal.util->get_soft_armed()) {
         return;
@@ -53,9 +57,6 @@ void Copter::userhook_50Hz()
 #ifdef USERHOOK_MEDIUMLOOP
 void Copter::userhook_MediumLoop()
 {
-    rc().get_pwm((uint8_t)1,usr_roll);
-    rc().get_pwm((uint8_t)2,usr_pitch);
-
     //gcs().send_text(MAV_SEVERITY_INFO, "Roll:%u,Pitch:%u\n",usr_roll,usr_pitch);
 
     if (hal.util->get_soft_armed()) {
