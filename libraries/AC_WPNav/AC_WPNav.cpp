@@ -157,16 +157,18 @@ void AC_WPNav::wp_and_spline_init(float speed_cms, Vector3f stopping_point)
     // check _wp_radius_cm is reasonable
     _wp_radius_cm.set_and_save_ifchanged(MAX(_wp_radius_cm, WPNAV_WP_RADIUS_MIN));
 
+    if(!is_negative(speed_cms)) {
     // check _wp_speed
     _wp_speed_cms.set_and_save_ifchanged(MAX(_wp_speed_cms, WPNAV_WP_SPEED_MIN));
-
-    // initialise position controller
-    _pos_control.init_z_controller_stopping_point();
-    _pos_control.init_xy_controller_stopping_point();
 
     // initialize the desired wp speed if not already done
     _wp_desired_speed_xy_cms = is_positive(speed_cms) ? speed_cms : _wp_speed_cms;
     _wp_desired_speed_xy_cms = MAX(_wp_desired_speed_xy_cms, WPNAV_WP_SPEED_MIN);
+    }
+
+    // initialise position controller
+    _pos_control.init_z_controller_stopping_point();
+    _pos_control.init_xy_controller_stopping_point();
 
     // initialise position controller speed and acceleration
     _pos_control.set_max_speed_accel_xy(_wp_desired_speed_xy_cms, _wp_accel_cmss);

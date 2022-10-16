@@ -1328,7 +1328,7 @@ void ModeAuto::do_nav_wp(const AP_Mission::Mission_Command& cmd)
                 stopping_point = takeoff_complete_pos.tofloat();
             }
         }
-        wp_nav->wp_and_spline_init(0, stopping_point);
+        wp_nav->wp_and_spline_init(-1, stopping_point);
     }
 
     // get waypoint's location from command and send to wp_nav
